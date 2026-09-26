@@ -1,0 +1,222 @@
+@import "tailwindcss";
+
+@theme {
+  /* Ledger paper: a pale olive-tinged stock, deliberately not cream */
+  --color-paper: #eef0e6;
+  --color-paper-deep: #e4e7d5;
+  --color-paper-deepest: #d8dcc5;
+  --color-card: #fbfbf3;
+
+  --color-ink: #1d231c;
+  --color-ink-soft: #4f5849;
+  --color-line: #ced3bb;
+
+  /* The single signal hue: blue-black ledger ink, reserved for the trade moment */
+  --color-signal: #1e43d8;
+  --color-signal-deep: #1733a6;
+
+  /* Money hues, used sparingly and consistently */
+  --color-gain: #0b6b34;
+  --color-gain-soft: #dcebda;
+  --color-loss: #a92a1e;
+  --color-loss-soft: #f2ded6;
+
+  --color-night: #161d17;
+
+  --font-display: "Zilla Slab", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Hanken Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background-color: var(--color-signal);
+    color: #ffffff;
+  }
+
+  :where(a, button, [tabindex], input):focus-visible {
+    outline: 3px solid var(--color-signal);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* faint stock-paper grain over the whole page */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@utility focus-ring-paper {
+  &:focus-visible {
+    outline-color: var(--color-paper);
+  }
+}
+
+@utility mask-fade-l {
+  mask-image: linear-gradient(to right, transparent, black 32px);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 32px);
+}
+
+/* ------------------------------------------------------------------
+   The single orchestrated load moment: scan sweep -> bars grow ->
+   price line draws -> settled ticket slides in. Everything's natural
+   state is the final state, so disabling animations is lossless.
+------------------------------------------------------------------- */
+
+@keyframes scan-x {
+  0% {
+    left: 0;
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% - 2px);
+    opacity: 0;
+  }
+}
+
+.scan-sweep {
+  animation: scan-x 1.65s cubic-bezier(0.45, 0.05, 0.25, 1) 0.35s both;
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+.bar-grow {
+  transform-origin: bottom;
+  animation: bar-grow 0.55s cubic-bezier(0.2, 0.7, 0.25, 1) both;
+}
+
+@keyframes line-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+.line-draw {
+  stroke-dasharray: 1;
+  animation: line-draw 1.4s cubic-bezier(0.3, 0.6, 0.3, 1) 0.25s both;
+}
+
+@keyframes ticket-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) rotate(-4deg);
+  }
+}
+
+.ticket-in {
+  animation: ticket-in 0.75s cubic-bezier(0.2, 0.8, 0.25, 1) 1.6s both;
+}
+
+/* live-feed details, continuous but quiet */
+
+@keyframes live-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.live-dot {
+  animation: live-blink 2.6s ease-in-out infinite;
+}
+
+@keyframes digit-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+}
+
+.digit-in {
+  animation: digit-in 0.35s ease-out both;
+}
+
+/* Login modal entrance */
+
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.modal-overlay {
+  animation: modal-fade 0.2s ease-out both;
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.modal-card {
+  animation: modal-in 0.3s cubic-bezier(0.2, 0.8, 0.25, 1) backwards;
+}
+
+@media (max-width: 639px) {
+  .modal-card {
+    animation-name: sheet-in;
+    animation-duration: 0.35s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .scan-sweep,
+  .bar-grow,
+  .line-draw,
+  .ticket-in,
+  .live-dot,
+  .digit-in,
+  .modal-overlay,
+  .modal-card {
+    animation: none !important;
+  }
+  .scan-sweep {
+    opacity: 0;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
