@@ -13,7 +13,7 @@ const steps = [
           100
         </p>
         <p>
-          <span className="text-ink-soft">digits {"{0,1}"}</span> 15 × ·{" "}
+          <span className="text-ink-soft">digits {"{8,9}"}</span> 15 × ·{" "}
           <span className="font-semibold text-signal">30.0%</span>
           <span className="text-ink-soft"> · expected</span> 10 × · 20.0%
         </p>
@@ -27,8 +27,8 @@ const steps = [
     artifact: (
       <ul className="space-y-2 rounded-lg border border-line bg-card px-4 py-3 font-mono text-[12px] leading-relaxed">
         {[
-          "rule LR-2 enabled · threshold ≥ +8.0pp",
-          "side under · barrier 2 · stake 10.00 flat",
+          "rule HR-2 enabled · threshold ≥ +8.0pp",
+          "side over · barrier 2 · stake 10.00 flat",
           "no match → no trade · reason logged",
         ].map((line) => (
           <li key={line} className="flex items-start gap-2.5">
@@ -46,7 +46,7 @@ const steps = [
     artifact: (
       <div className="rounded-lg border border-line bg-card px-4 py-3 font-mono text-[12px] leading-relaxed">
         <p>
-          quote 4.75 × → payout 47.50{" "}
+          quote 1.36 × → payout 13.60{" "}
           <span className="font-semibold text-gain">ok</span>
         </p>
         <p>
@@ -67,7 +67,7 @@ const logRows: { t: string; tag: string; tone?: string; msg: ReactNode }[] = [
     tag: "scan",
     msg: (
       <>
-        low-run +4.1pp, needs ≥ +8.0pp · <span className="text-ink-soft">skip</span>
+        high-run +4.1pp, needs ≥ +8.0pp · <span className="text-ink-soft">skip</span>
       </>
     ),
   },
@@ -75,12 +75,12 @@ const logRows: { t: string; tag: string; tone?: string; msg: ReactNode }[] = [
     t: "14:05:54",
     tag: "rule",
     tone: "text-signal",
-    msg: <>LR-2 fired · low-run +8.6pp ≥ +8.0pp</>,
+    msg: <>HR-2 fired · high-run +8.6pp ≥ +8.0pp</>,
   },
   {
     t: "14:05:54",
     tag: "quote",
-    msg: <>under 2 · 10 ticks · 4.75 × → 47.50</>,
+    msg: <>over 2 · 10 ticks · 1.36 × → 13.60</>,
   },
   {
     t: "14:05:54",
@@ -97,7 +97,7 @@ const logRows: { t: string; tag: string; tone?: string; msg: ReactNode }[] = [
     tag: "settle",
     msg: (
       <>
-        expiry digit 1 &lt; 2 · <span className="font-semibold text-gain">win +37.50</span>
+        expiry digit 8 {'>'} 2 · <span className="font-semibold text-gain">win +3.60</span>
       </>
     ),
   },

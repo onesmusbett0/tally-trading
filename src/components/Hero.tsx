@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowDown, ArrowRight } from "lucide-react";
 
-/* A rolling window of 50 ticks. Digit counts open at 30% for {0,1} vs the
+/* A rolling window of 50 ticks. Digit counts open at 30% for {8,9} vs the
    20% you'd expect, which is exactly the skew the demo rule fires on. */
-const OPENING_COUNTS = [8, 7, 4, 3, 5, 4, 4, 6, 5, 4];
+const OPENING_COUNTS = [4, 3, 5, 4, 4, 6, 5, 4, 8, 7];
 const WINDOW = 50;
 
 function mulberry32(seed: number) {
@@ -26,8 +26,8 @@ function buildOpeningDigits(): number[] {
     const j = Math.floor(rand() * (i + 1));
     [flat[i], flat[j]] = [flat[j], flat[i]];
   }
-  const lastOne = flat.lastIndexOf(1);
-  [flat[flat.length - 1], flat[lastOne]] = [flat[lastOne], flat[flat.length - 1]];
+  const lastHot = flat.lastIndexOf(9);
+  [flat[flat.length - 1], flat[lastHot]] = [flat[lastHot], flat[flat.length - 1]];
   return flat;
 }
 
@@ -36,7 +36,7 @@ const SPARK = [
   1041.9, 1041.62, 1041.86, 1042.13, 1042.02, 1042.4, 1042.18, 1042.55,
   1042.31, 1042.6, 1042.44, 1042.83, 1042.58, 1042.9, 1043.12, 1042.87,
   1043.08, 1043.3, 1043.06, 1043.34, 1043.19, 1043.42, 1043.26, 1043.5,
-  1043.31, 1043.55, 1043.4, 1043.61,
+  1043.31, 1043.55, 1043.4, 1043.69,
 ];
 
 function sparkPath(values: number[], w: number, h: number, pad = 3): string {
@@ -59,12 +59,12 @@ export function Hero({ onOpenLogin }: { onOpenLogin: () => void }) {
   const [windowDigits, setWindowDigits] = useState<TallyEntry[]>(() =>
     initialDigits.map((v, i) => ({ v, id: i }))
   );
-  const [price, setPrice] = useState(1043.61);
+  const [price, setPrice] = useState(1043.69);
   const [ticks, setTicks] = useState(5214);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let cents = Math.round(1043.61 * 100);
+    let cents = Math.round(1043.69 * 100);
     let seq = initialDigits.length;
     const timer = window.setInterval(() => {
       const d = Math.floor(Math.random() * 10);
@@ -211,7 +211,7 @@ export function Hero({ onOpenLogin }: { onOpenLogin: () => void }) {
                   <div key={digit} className="flex h-24 items-end sm:h-28">
                     <div
                       className={`bar-grow w-full rounded-[5px] transition-[height] duration-700 ease-out ${
-                        digit <= 1 ? "bg-signal" : "bg-ink/[0.18]"
+                        digit >= 8 ? "bg-signal" : "bg-ink/[0.18]"
                       }`}
                       style={{
                         height: `${Math.max(6, (count / maxCount) * 100)}%`,
@@ -226,7 +226,7 @@ export function Hero({ onOpenLogin }: { onOpenLogin: () => void }) {
                   <span
                     key={digit}
                     className={`text-center font-mono text-[11px] ${
-                      digit <= 1 ? "font-semibold text-signal" : "text-ink-soft"
+                      digit >= 8 ? "font-semibold text-signal" : "text-ink-soft"
                     }`}
                   >
                     {digit}
@@ -234,7 +234,7 @@ export function Hero({ onOpenLogin }: { onOpenLogin: () => void }) {
                 ))}
               </div>
               <p className="mt-3 font-mono text-[11px] leading-relaxed text-ink-soft">
-                rolling tally, last 50 ticks · digits 0-1 running 30% against
+                rolling tally, last 50 ticks · digits 8-9 running 30% against
                 20% expected
               </p>
             </div>
@@ -274,7 +274,7 @@ export function Hero({ onOpenLogin }: { onOpenLogin: () => void }) {
             </div>
             <div className="mt-3 flex items-baseline justify-between gap-3">
               <p className="font-display text-[26px] font-semibold leading-none tracking-[-0.01em]">
-                Under 2
+                Over 2
               </p>
               <p className="font-mono text-[11px] text-ink-soft">10 ticks</p>
             </div>
@@ -284,16 +284,16 @@ export function Hero({ onOpenLogin }: { onOpenLogin: () => void }) {
                 <dd>10.00 USD</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-ink-soft">payout · 4.75 ×</dt>
-                <dd>47.50 USD</dd>
+                <dt className="text-ink-soft">payout · 1.36 ×</dt>
+                <dd>13.60 USD</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-ink-soft">result · expiry digit 1</dt>
-                <dd className="font-semibold text-gain">+37.50</dd>
+                <dt className="text-ink-soft">result · expiry digit 8</dt>
+                <dd className="font-semibold text-gain">+3.60</dd>
               </div>
             </dl>
             <p className="mt-3 font-mono text-[11px] text-ink-soft">
-              rule LR-2 · low-run 8.6pp over · 14:05:54
+              rule HR-2 · high-run 8.6pp over · 14:05:54
             </p>
           </div>
         </div>
